@@ -37,18 +37,20 @@ BigNum *parArrayProd(int a[], int i, int j, int p) {
   // finalmente el producto de los resultados calculados por ambos threads.
 
   // Esto compila y pasa make run-san, pero no pasa run-O ni run-g
-  printf("FUNCTION CALL -- i=%d,j=%d,p=%d\n",i, j, p);
+  // NOT ANYMORE !!!
+  
+  //printf("FUNCTION CALL -- i=%d,j=%d,p=%d\n",i, j, p);
   if (p == 1 || i == j){
-    printf("Sec...i=%d,j=%d\n", i, j);
+    //printf("Sec...i=%d,j=%d\n", i, j);
 
     return seqArrayProd(a, i, j);
   }else{
     int h = (i+j)/2;
     pthread_t pid;
 
-    printf("Thread...i=%d,j=%d,h=%d\n", i, j, h);
+    //printf("Thread...i=%d,j=%d,h=%d\n", i, j, h);
 
-    BigNum * ZERO = 0; // place holder
+    BigNum * ZERO = smallNum(0); // place holder
     Args args = {i, h, p/2, ZERO, a};
     pthread_create(&pid, NULL, arrayProdForThread, &args);
     BigNum * right = parArrayProd(a, h+1, j, p-p/2);
@@ -57,10 +59,10 @@ BigNum *parArrayProd(int a[], int i, int j, int p) {
     BigNum * prod = bigMul(left, right);
     
     freeBigNum(ZERO);
-    freeBigNum(args.res);
+    //freeBigNum(args.res); <- stupid
     freeBigNum(left);
     freeBigNum(right);
-    free(args.a);
+    
     return prod;
   }
 }
