@@ -9,12 +9,13 @@
 // ...
 #define TRUE 1
 #define FALSE 0
+
 #define MAX_INT 0x7fffffff
+
 #define LOCK(m) (pthread_mutex_lock(&m))
 #define UNLOCK(m) (pthread_mutex_unlock(&m))
 #define WAIT(c,m) (pthread_cond_wait(&c,&m))
 #define BROADCAST(c) (pthread_cond_broadcast(&c))
-
 
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
