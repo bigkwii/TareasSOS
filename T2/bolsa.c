@@ -21,39 +21,36 @@ pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
 // seller stuff
-int * thereAreSellers;
-int * lowestPrice;
-char ** lowestPriceName;
+int precioMin[1];
+char * vendedorMin[1];
+int hayVendedor[1];
 // buyer stuff
-int * thereAreBuyers;
-char ** currentBuyerName;
+char * compradorActual[1];
+int ready[1];
+
 
 int vendo(int precio, char *vendedor, char *comprador) {
   // retorna TRUE si le compran y guarda nombre de comprador en comprador
   // retorna FALSE si no tiene el precio mas bajo
   LOCK(m);
-  if (lowestPrice != NULL && precio >= *lowestPrice) {
-    UNLOCK(m);
-    return FALSE;
+  if(precio < precioMin[0]){
+    precioMin[0] = precio;
+    BROADCAST(c);
   }
-  else {
-  	*thereAreSellers = TRUE;
-  	*lowestPrice = precio;
-  	*lowestPriceName = vendedor;
-  	BROADCAST(c);
-  }
-  while(precio < *lowestPrice){
-  	WAIT(c,m);
-  	LOCK(m);
-  	if (precio >= *lowestPrice) break;
-  	else {
-  		comprador = *currentBuyerName;
-  		*thereAreSellers = FALSE;
-  		*lowestPrice = MAX_INT;
-  		UNLOCK(m);
-  		BROADCAST(c);
-  		return TRUE;
-  	}
+  while(precio>=precioMin[0]){
+    WAIT(c,m);
+    if(precio >= precioMin[0]){
+      break;
+    }
+    if(ready[0]){
+      comprador = compradorActual[0];
+      hayVendedor[0] = FALSE;
+      precioMin[0] = MAX_INT;
+      ready[0] = FALSE;
+      UNLOCK(m);
+      BROADCAST(c);
+      return TRUE;
+    }
   }
   UNLOCK(m);
   return FALSE;
@@ -63,14 +60,21 @@ int compro(char *comprador, char *vendedor) {
   // retorna precio del vendedor al que se le compro
   // y guarda el nombre del verdedor en vendedor
   // si no hay vendedores, retorna 0
-  if(thereAreSellers == NULL || !*thereAreSellers) return 0;
   LOCK(m);
-  *currentBuyerName = comprador;
-  vendedor = *lowestPriceName;
-  int buyPrice = *lowestPrice;
-  UNLOCK(m);
-  BROADCAST(c);
-  return buyPrice;
+  int precioActual = 0;
+  if(!hayVendedor[0]) {
+    UNLOCK(m);
+    return precioActual;
+  }
+  else {
+    compradorActual[0] = comprador;
+    vendedor = vendedorMin[0];
+    ready[0] = TRUE;
+    precioActual = precioMin[0];
+    BROADCAST(c);
+    UNLOCK(m);
+  }
+  return precioActual;
 }
 
 
