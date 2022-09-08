@@ -32,8 +32,10 @@ int vendo(int precio, char *vendedor, char *comprador) {
   // retorna TRUE si le compran y guarda nombre de comprador en comprador
   // retorna FALSE si no tiene el precio mas bajo
   LOCK(m);
-  if (lowestPrice == NULL || precio >= *lowestPrice) return FALSE;
-  if (precio >= *lowestPrice) return FALSE;
+  if (lowestPrice != NULL && precio >= *lowestPrice) {
+    UNLOCK(m);
+    return FALSE;
+  }
   else {
   	*thereAreSellers = TRUE;
   	*lowestPrice = precio;
