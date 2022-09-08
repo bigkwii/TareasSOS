@@ -10,12 +10,13 @@
 #define TRUE 1
 #define FALSE 0
 
-#define MAX_INT 0x7fffffff
+#define MAX_INT 999
 
 #define LOCK(m) (pthread_mutex_lock(&m))
 #define UNLOCK(m) (pthread_mutex_unlock(&m))
 #define WAIT(c,m) (pthread_cond_wait(&c,&m))
 #define BROADCAST(c) (pthread_cond_broadcast(&c))
+#define SIGNAL(c) (pthread_cond_signal(&c))
 
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
@@ -33,22 +34,25 @@ int vendo(int precio, char *vendedor, char *comprador) {
   // retorna TRUE si le compran y guarda nombre de comprador en comprador
   // retorna FALSE si no tiene el precio mas bajo
   LOCK(m);
-  if(precio < precioMin[0]){
+  if(!hayVendedor[0] || precio < precioMin[0]){
     precioMin[0] = precio;
-    BROADCAST(c);
+    vendedorMin[0] = vendedor;
+    hayVendedor[0] = TRUE;
+    SIGNAL(c);
   }
   while(precio>=precioMin[0]){
     WAIT(c,m);
-    if(precio >= precioMin[0]){
+    if(precio > precioMin[0]){
       break;
     }
     if(ready[0]){
-      comprador = compradorActual[0];
+      strcpy(comprador,compradorActual[0]);
       hayVendedor[0] = FALSE;
+      precio = precioMin[0];
       precioMin[0] = MAX_INT;
       ready[0] = FALSE;
+      SIGNAL(c);
       UNLOCK(m);
-      BROADCAST(c);
       return TRUE;
     }
   }
@@ -62,16 +66,16 @@ int compro(char *comprador, char *vendedor) {
   // si no hay vendedores, retorna 0
   LOCK(m);
   int precioActual = 0;
-  if(!hayVendedor[0]) {
+  if(hayVendedor[0] == FALSE) {
     UNLOCK(m);
     return precioActual;
   }
   else {
     compradorActual[0] = comprador;
-    vendedor = vendedorMin[0];
-    ready[0] = TRUE;
+    strcpy(vendedor,vendedorMin[0]);
     precioActual = precioMin[0];
-    BROADCAST(c);
+    ready[0] = TRUE;
+    SIGNAL(c);
     UNLOCK(m);
   }
   return precioActual;
