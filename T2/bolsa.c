@@ -21,32 +21,33 @@ pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
 // seller stuff
-int thereAreSellers = FALSE;
-int lowestPrice = MAX_INT;
-char * lowestPriceName;
+int * thereAreSellers;
+int * lowestPrice;
+char ** lowestPriceName;
 // buyer stuff
-int thereAreBuyers = FALSE;
-char * currentBuyerName;
+int * thereAreBuyers;
+char ** currentBuyerName;
 
 int vendo(int precio, char *vendedor, char *comprador) {
   // retorna TRUE si le compran y guarda nombre de comprador en comprador
   // retorna FALSE si no tiene el precio mas bajo
   LOCK(m);
-  if (precio >= lowestPrice) return FALSE;
+  if (lowestPrice == NULL || precio >= *lowestPrice) return FALSE;
+  if (precio >= *lowestPrice) return FALSE;
   else {
-  	thereAreSellers = TRUE;
-  	lowestPrice = precio;
-  	lowestPriceName = vendedor;
+  	*thereAreSellers = TRUE;
+  	*lowestPrice = precio;
+  	*lowestPriceName = vendedor;
   	BROADCAST(c);
   }
-  while(precio < lowestPrice){
+  while(precio < *lowestPrice){
   	WAIT(c,m);
   	LOCK(m);
-  	if (precio >= lowestPrice) break;
+  	if (precio >= *lowestPrice) break;
   	else {
-  		comprador = currentBuyerName;
-  		thereAreSellers = FALSE;
-  		lowestPrice = MAX_INT;
+  		comprador = *currentBuyerName;
+  		*thereAreSellers = FALSE;
+  		*lowestPrice = MAX_INT;
   		UNLOCK(m);
   		BROADCAST(c);
   		return TRUE;
@@ -60,11 +61,11 @@ int compro(char *comprador, char *vendedor) {
   // retorna precio del vendedor al que se le compro
   // y guarda el nombre del verdedor en vendedor
   // si no hay vendedores, retorna 0
-  if(!thereAreSellers) return 0;
+  if(thereAreSellers == NULL || !*thereAreSellers) return 0;
   LOCK(m);
-  currentBuyerName = comprador;
-  vendedor = lowestPriceName;
-  int buyPrice = lowestPrice;
+  *currentBuyerName = comprador;
+  vendedor = *lowestPriceName;
+  int buyPrice = *lowestPrice;
   UNLOCK(m);
   BROADCAST(c);
   return buyPrice;
