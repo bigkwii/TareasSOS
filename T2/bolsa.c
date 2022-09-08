@@ -36,7 +36,8 @@ int vendo(int precio, char *vendedor, char *comprador) {
   LOCK(m);
   if(!hayVendedor[0] || precio < precioMin[0]){
     precioMin[0] = precio;
-    vendedorMin[0] = vendedor;
+    char * vendedorMinLocal = vendedorMin[0];
+    strcpy(vendedorMinLocal, vendedor);
     hayVendedor[0] = TRUE;
     SIGNAL(c);
   }
@@ -66,18 +67,15 @@ int compro(char *comprador, char *vendedor) {
   // si no hay vendedores, retorna 0
   LOCK(m);
   int precioActual = 0;
-  if(hayVendedor[0] == FALSE) {
-    UNLOCK(m);
-    return precioActual;
-  }
-  else {
-    compradorActual[0] = comprador;
+  if(hayVendedor[0]) {
+    char * compradorActualLocal = compradorActual[0];
+    strcpy(compradorActualLocal,comprador);
     strcpy(vendedor,vendedorMin[0]);
     precioActual = precioMin[0];
     ready[0] = TRUE;
     SIGNAL(c);
-    UNLOCK(m);
   }
+  UNLOCK(m);
   return precioActual;
 }
 
