@@ -10,7 +10,8 @@
 #define TRUE 1
 #define FALSE 0
 
-#define MAX_INT 999
+// states
+#define STANDBY 1 // "vendedor disponible, consulte uwu"
 
 #define LOCK(m) (pthread_mutex_lock(&m))
 #define UNLOCK(m) (pthread_mutex_unlock(&m))
@@ -21,62 +22,80 @@
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
-// seller stuff
-int precioMin[1];
-char * vendedorMin[1];
-int hayVendedor[1];
-// buyer stuff
-char * compradorActual[1];
-int ready[1];
-
+// cool pointers B)
+int * precioMin;
+char ** vendedorMin;
+char ** compradorActual;
+int * state;
+int * winGlobal;
 
 int vendo(int precio, char *vendedor, char *comprador) {
   // retorna TRUE si le compran y guarda nombre de comprador en comprador
   // retorna FALSE si no tiene el precio mas bajo
+  int stateLocal = STANDBY;
+  int win = FALSE;
   LOCK(m);
-  if(!hayVendedor[0] || precio < precioMin[0]){
-    precioMin[0] = precio;
-    char * vendedorMinLocal = vendedorMin[0];
-    strcpy(vendedorMinLocal, vendedor);
-    hayVendedor[0] = TRUE;
-    SIGNAL(c);
+  //printf("hola, soy %s, vengo a vender. a %d mi rey.\n",vendedor,precio);
+  if (precioMin == NULL || *precioMin > precio){
+    // :)
+    //printf("hola, soy %s, ahora soy el bkn.\n",vendedor);
+    precioMin = &precio;
+    vendedorMin = &vendedor;
+    compradorActual = &comprador;
+    state = &stateLocal;
+    winGlobal = &win;
+    BROADCAST(c);
+  }else{
+    // :(
+    //printf("hola, soy %s, me fue mal.\n",vendedor);
+    UNLOCK(m);
+    return win;
   }
-  while(precio>=precioMin[0]){
+  while(precioMin != NULL && precioMin != NULL && precio == *precioMin){
+    //printf("*vendedor %s se fue a mimir*\n",vendedor);
     WAIT(c,m);
-    if(precio > precioMin[0]){
+    //printf("*vendedor %s se desperto*\n",vendedor);
+
+    if(state != NULL){
+      // lo despertaron, pero no para comprar
+      // D:
+      //printf("hola, soy %s, me han derrocado. %d era muy caro. otro vende a menos.\n",vendedor, precio);
       break;
     }
-    if(ready[0]){
-      strcpy(comprador,compradorActual[0]);
-      hayVendedor[0] = FALSE;
-      precio = precioMin[0];
-      precioMin[0] = MAX_INT;
-      ready[0] = FALSE;
-      SIGNAL(c);
+    if(state == NULL){
+      // lo despertaron para comprar
+      // >:3
+      //printf("SOLD. hola, soy %s, le vendi a %s a %d.\n",vendedor, comprador, precio);
       UNLOCK(m);
-      return TRUE;
+      return win;
     }
   }
   UNLOCK(m);
-  return FALSE;
+  return win;
 }
 
 int compro(char *comprador, char *vendedor) {
   // retorna precio del vendedor al que se le compro
   // y guarda el nombre del verdedor en vendedor
   // si no hay vendedores, retorna 0
+  int precio = 0;
   LOCK(m);
-  int precioActual = 0;
-  if(hayVendedor[0]) {
-    char * compradorActualLocal = compradorActual[0];
-    strcpy(compradorActualLocal,comprador);
-    strcpy(vendedor,vendedorMin[0]);
-    precioActual = precioMin[0];
-    ready[0] = TRUE;
-    SIGNAL(c);
+  //printf("hola, soy %s, vengo a comprar.\n",comprador);
+  if(state != NULL && *state == STANDBY){
+    strcpy(vendedor, *vendedorMin);
+    precio = *precioMin;
+    strcpy(*compradorActual, comprador);
+    precioMin = NULL;
+    vendedorMin = NULL;
+    compradorActual = NULL;
+    state = NULL;
+    *winGlobal = TRUE;
+    winGlobal = NULL;
+    //printf("BOUGHT. hola, soy %s, logre comprar a %s a %d.\n",comprador, vendedor, precio);
+    BROADCAST(c);
   }
+  //if(precio == 0) printf("hola, soy %s, no habia nadie.\n",comprador);
   UNLOCK(m);
-  return precioActual;
+  return precio;
 }
-
 

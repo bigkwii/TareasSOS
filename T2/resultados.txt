@@ -1,0 +1,116 @@
+Sistema operativo utilizado
+Linux debian11mate 5.10.0-18-amd64 #1 SMP Debian 5.10.140-1 (2022-09-02) x86_64 GNU/Linux
+==== run-san ====
+gcc -g -DSAN=1 -fsanitize=address -fsanitize=undefined -Wall -Werror -std=c18  test-bolsa.c bolsa.c -lm -lpthread -o bolsa.bin-san
+./bolsa.bin-san
+El test del enunciado
+Se lanzo pedro
+pedro: vendo a 10
+Se lanzo juan
+juan: vendo a 5
+pedro: 1era. venta rechazada
+pedro: vendo a 7
+pedro: 2da. venta rechazada
+Se lanzo diego
+diego: compro
+juan: ok
+diego: ok
+Ok
+
+--------------------
+El test de robustez: se lanzaran 10 compradores y 100 vendedores
+Cada comprador intentara 10000 compras
+Cada . son 1000 compraventas exitosas
+Partieron
+.........................................................................................
+comp0 hara una pausa de 3 segundos
+comp0 hara la ultima compra
+comp0 hizo 9165 compras
+comp1 hizo 9155 compras
+comp2 hizo 9102 compras
+comp3 hizo 8732 compras
+comp4 hizo 9110 compras
+comp5 hizo 8967 compras
+comp6 hizo 9111 compras
+comp7 hizo 9010 compras
+comp8 hizo 8144 compras
+comp9 hizo 9169 compras
+Se hicieron en total 89665 compras
+Ok
+Felicitaciones: paso exitosamente los 2 tests de prueba
+==== run-g ====
+gcc -g -Wall -Werror -std=c18  test-bolsa.c bolsa.c -lm -lpthread -o bolsa.bin-g
+./bolsa.bin-g
+El test del enunciado
+Se lanzo pedro
+pedro: vendo a 10
+Se lanzo juan
+juan: vendo a 5
+pedro: 1era. venta rechazada
+pedro: vendo a 7
+pedro: 2da. venta rechazada
+Se lanzo diego
+diego: compro
+juan: ok
+diego: ok
+Ok
+
+--------------------
+El test de robustez: se lanzaran 10 compradores y 100 vendedores
+Cada comprador intentara 10000 compras
+Cada . son 1000 compraventas exitosas
+Partieron
+.........................................................................................
+comp0 hara una pausa de 3 segundos
+comp0 hara la ultima compra
+comp0 hizo 9064 compras
+comp1 hizo 8954 compras
+comp2 hizo 8852 compras
+comp3 hizo 9018 compras
+comp4 hizo 8994 compras
+comp5 hizo 9010 compras
+comp6 hizo 9076 compras
+comp7 hizo 9099 compras
+comp8 hizo 8812 compras
+comp9 hizo 9023 compras
+Se hicieron en total 89902 compras
+Ok
+Felicitaciones: paso exitosamente los 2 tests de prueba
+==== run ====
+gcc -O -DOPT=1 -Wall -Werror -std=c18  test-bolsa.c bolsa.c -lm -lpthread -o bolsa.bin
+./bolsa.bin
+El test del enunciado
+Se lanzo pedro
+pedro: vendo a 10
+Se lanzo juan
+juan: vendo a 5
+pedro: 1era. venta rechazada
+pedro: vendo a 7
+pedro: 2da. venta rechazada
+Se lanzo diego
+diego: compro
+juan: ok
+diego: ok
+Ok
+
+--------------------
+El test de robustez: se lanzaran 10 compradores y 100 vendedores
+Cada comprador intentara 10000 compras
+Cada . son 1000 compraventas exitosas
+Partieron
+....................................................................................
+comp0 hara una pausa de 3 segundos
+comp0 hara la ultima compra
+comp0 hizo 9044 compras
+comp1 hizo 8620 compras
+comp2 hizo 8655 compras
+comp3 hizo 8089 compras
+comp4 hizo 8636 compras
+comp5 hizo 8222 compras
+comp6 hizo 8159 compras
+comp7 hizo 8837 compras
+comp8 hizo 8174 compras
+comp9 hizo 8455 compras
+Se hicieron en total 84891 compras
+Ok
+Felicitaciones: paso exitosamente los 2 tests de prueba
