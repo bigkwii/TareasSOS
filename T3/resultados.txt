@@ -1,0 +1,106 @@
+Sistema operativo utilizado
+Linux debian11mate 5.10.0-18-amd64 #1 SMP Debian 5.10.140-1 (2022-09-02) x86_64 GNU/Linux
+==== run-san ====
+gcc -g -DSAN=1 -fsanitize=address -fsanitize=undefined -Wall -Werror -std=c18  test-disco.c disco.c pss.c -lm -lpthread -o disco.bin-san
+./disco.bin-san
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de eva es adan
+La pareja de adan es eva
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de ana es pedro
+La pareja de pedro es ana
+juan espera pareja
+La pareja de sara es juan
+La pareja de juan es sara
+diego espera pareja
+alba espera pareja
+La pareja de diego es alba
+La pareja de alba es diego
+Aprobado
+Test: robustez
+Aprobado
+Felicitaciones: aprobo todos los tests
+==== run-thr ====
+gcc -g -DSAN=1 -fsanitize=thread -Wall -Werror -std=c18  test-disco.c disco.c pss.c -lm -lpthread -o disco.bin-thr
+./disco.bin-thr
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de eva es adan
+La pareja de adan es eva
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de ana es pedro
+La pareja de pedro es ana
+juan espera pareja
+La pareja de sara es juan
+La pareja de juan es sara
+diego espera pareja
+alba espera pareja
+La pareja de diego es alba
+La pareja de alba es diego
+Aprobado
+Test: robustez
+Aprobado
+Felicitaciones: aprobo todos los tests
+==== run-g ====
+gcc -g -Wall -Werror -std=c18  test-disco.c disco.c pss.c -lm -lpthread -o disco.bin-g
+./disco.bin-g
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de eva es adan
+La pareja de adan es eva
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de ana es pedro
+La pareja de pedro es ana
+juan espera pareja
+La pareja de sara es juan
+La pareja de juan es sara
+diego espera pareja
+alba espera pareja
+La pareja de diego es alba
+La pareja de alba es diego
+Aprobado
+Test: robustez
+Aprobado
+Felicitaciones: aprobo todos los tests
+==== run ====
+gcc -O -DOPT=1 -Wall -Werror -std=c18  test-disco.c disco.c pss.c -lm -lpthread -o disco.bin
+./disco.bin
+Test: una sola pareja, adan y eva
+eva espera pareja
+adan espera pareja
+La pareja de eva es adan
+La pareja de adan es eva
+Aprobado
+Test: el ejemplo del enunciado
+ana espera pareja
+sara espera pareja
+pedro espera pareja
+La pareja de ana es pedro
+La pareja de pedro es ana
+juan espera pareja
+La pareja de sara es juan
+La pareja de juan es sara
+diego espera pareja
+alba espera pareja
+La pareja de diego es alba
+La pareja de alba es diego
+Aprobado
+Test: robustez
+Aprobado
+Felicitaciones: aprobo todos los tests
