@@ -1,0 +1,28 @@
+#define _XOPEN_SOURCE 500
+
+#include "nthread-impl.h"
+
+// Use los estados predefinidos WAIT_ACCEDER y WAIT_COMPARTIR
+// El descriptor de thread incluye el campo ptr para que Ud. lo use
+// a su antojo.
+
+... defina aca sus variables globales con el atributo static ...
+
+// nth_compartirInit se invoca al partir nThreads para Ud. inicialize
+// sus variables globales
+
+void nth_compartirInit(void) {
+  ...
+}
+
+void nCompartir(void *ptr) {
+  ...
+}
+
+void *nAcceder(int max_millis) {
+  ...
+}
+
+void nDevolver(void) {
+  ...
+}
