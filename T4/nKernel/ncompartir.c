@@ -57,7 +57,7 @@ void nDevolver(void) {
   START_CRITICAL
   nAcc--;
   nThread thisTh= nSelf();
-  if(gTh->status == WAIT_ACCEDER && nAcc == 0){
+  if(gTh != NULL && gTh->status == WAIT_ACCEDER && nAcc == 0){
     setReady(gTh);
     schedule();
   }
