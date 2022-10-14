@@ -1,0 +1,38 @@
+#define _XOPEN_SOURCE 500
+
+#include "nthread-impl.h"
+
+// Use los estados predefinidos WAIT_ACCEDER, WAIT_ACCEDER_TIMEOUT y
+// WAIT_COMPARTIR
+// El descriptor de thread incluye el campo ptr para que Ud. lo use
+// a su antojo.
+
+
+// Defina aca sus variables globales.
+// Para la cola de esperade nCompartir prefiera el tipo Queue.
+
+// nth_compartirInit se invoca al partir nThreads para que Ud. inicialize
+// sus variables globales
+
+void nth_compartirInit(void) {
+  // ...
+}
+
+void nCompartir(void *ptr) {
+  // ...
+}
+
+static void f(nThread th) {
+  // programe aca la funcion que usa nth_queryThread para consultar si
+  // th esta en la cola de espera de nCompartir.  Si esta presente
+  // eliminela con nth_delQueue.
+  // Ver funciones en nKernel/nthread-impl.h y nKernel/pss.h
+}
+
+void *nAcceder(int max_millis) {
+  // ...  use nth_programTimer(nanos, f);  f es la funcion de mas arriba
+}
+
+void nDevolver(void) {
+  // ...
+}
