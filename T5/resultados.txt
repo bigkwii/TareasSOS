@@ -1,5 +1,5 @@
 Sistema operativo utilizado
-Linux debian11mate 5.10.0-19-amd64 #1 SMP Debian 5.10.149-1 (2022-10-17) x86_64 GNU/Linux
+Linux bigkwii 5.10.0-18-amd64 #1 SMP Debian 5.10.140-1 (2022-09-02) x86_64 GNU/Linux
 ==== run-san =============================
 NTHOBJ=nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
 gcc -g -c -fsanitize=address -fsanitize=undefined -DSANITIZE -Wall -Werror -pedantic -std=c18 -Wno-unused-function -Wno-unused-variable -DNTHREADS  nthread.c nutil.c ntime.c pss.c sched-fcfs.c sched-rr.c ncompartir.c sched-pri-1core.c sched-fcfs-1core.c sem.c mutex-cond.c nmsgs.c nStack-amd64.s nsystem.c
@@ -20,24 +20,313 @@ Primer test exitoso
 El test del enunciado
     0: lanzando T4
     0: T4 solicita acceder
- 1004: lanzando T3
- 1004: T3 solicita acceder
- 3007: lanzando T1
- 3007: T1 solicita compartir p
- 3007: T4 accede a p
- 3007: T3 accede a p
- 4008: lanzando T2
- 4008: T2 solicita acceder
- 4008: T2 accede a p
- 5007: T4 devuelve
- 6009: T2 devuelve
- 7008: T3 devuelve
- 7008: T1 termina de compartir p
- 9012: T1 solicita compartir q
-11009: T2 solicita acceder
-11009: T2 accede a q
-12013: T2 devuelve
-12013: T1 termina de compartir q
+ 1000: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3002: T4 accede a p
+ 3002: T3 accede a p
+ 4002: lanzando T2
+ 4002: T2 solicita acceder
+ 4002: T2 accede a p
+ 5002: T4 devuelve
+ 6003: T2 devuelve
+ 7002: T3 devuelve
+ 7002: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11003: T2 solicita acceder
+11003: T2 accede a q
+12003: T2 devuelve
+12003: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 25 segundos
+Se hicieron 101 llamadas a nCompartir
+
+Los mismos testeos de la tarea 4, con timeout que no se vence
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3002: T4 accede a p
+ 3002: T3 accede a p
+ 4002: lanzando T2
+ 4002: T2 solicita acceder
+ 4002: T2 accede a p
+ 5002: T4 devuelve
+ 6002: T2 devuelve
+ 7002: T3 devuelve
+ 7002: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11003: T2 solicita acceder
+11003: T2 accede a q
+12003: T2 devuelve
+12003: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 25 segundos
+Se hicieron 101 llamadas a nCompartir
+
+Nuevos testeos para timeouts que si se vencen
+nAcceder con timeout que se vence
+T=0 Creando 1 threads
+T=0 llamada a nAcceder(100) id=0
+T=0 esperando thread 0
+T=100 nAcceder id=0 retorna con timeout vencido
+T=101 thread 0 termina
+Ok
+2 nAcceder con timeout que se vencen
+T=0 Creando 2 threads
+T=0 llamada a nAcceder(300) id=1
+T=0 esperando thread 0
+T=100 llamada a nAcceder(100) id=0
+T=201 nAcceder id=0 retorna con timeout vencido
+T=201 thread 0 termina
+T=201 esperando thread 1
+T=301 nAcceder id=1 retorna con timeout vencido
+T=301 thread 1 termina
+Ok
+3 nAcceder con timeout, 2 se vencen, uno no
+T=0 Creando 3 threads
+T=1 llamada a nAcceder(600) id=2
+T=101 llamada a nAcceder(300) id=1
+T=201 llamada a nAcceder(100) id=0
+T=301 nAcceder id=0 retorna con timeout vencido
+T=401 nAcceder id=1 retorna con timeout vencido
+T=501 llamando a nCompartir
+T=501 nAcceder id=2 retorna 
+T=601 nDevolver id=2
+T=601 nCompartir retorna
+T=601 esperando thread 0
+T=602 thread 0 termina
+T=602 esperando thread 1
+T=602 thread 1 termina
+T=602 esperando thread 2
+T=602 thread 2 termina
+Ok
+5 nAcceder con timeout, 3 se vencen, 2 no
+T=0 Creando 5 threads
+T=1 llamada a nAcceder(1000) id=3
+T=101 llamada a nAcceder(900) id=1
+T=201 llamada a nAcceder(400) id=2
+T=301 llamada a nAcceder(400) id=0
+T=401 llamada a nAcceder(400) id=4
+T=601 nAcceder id=2 retorna con timeout vencido
+T=701 nAcceder id=0 retorna con timeout vencido
+T=802 nAcceder id=4 retorna con timeout vencido
+T=902 llamando a nCompartir
+T=902 nAcceder id=3 retorna 
+T=902 nAcceder id=1 retorna 
+T=1002 nDevolver id=1
+T=1102 nDevolver id=3
+T=1102 nCompartir retorna
+T=1102 esperando thread 0
+T=1102 thread 0 termina
+T=1102 esperando thread 1
+T=1102 thread 1 termina
+T=1102 esperando thread 2
+T=1103 thread 2 termina
+T=1103 esperando thread 3
+T=1103 thread 3 termina
+T=1103 esperando thread 4
+T=1103 thread 4 termina
+Ok
+
+Felicitaciones: su tarea funciona correctamente
+Info: Number of cores = 1
+Info: total context changes = 695
+Info: Implicit context changes = 0
+--------------------------------------------
+./test-compartir.nbin-san -slice 1
+Info: setting 1-core round robin scheduling
+Los mismos testeos de la tarea 4, sin timeout
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3002: T1 solicita compartir p
+ 3002: T3 accede a p
+ 3002: T4 accede a p
+ 4002: lanzando T2
+ 4002: T2 solicita acceder
+ 4002: T2 accede a p
+ 5002: T4 devuelve
+ 6003: T2 devuelve
+ 7002: T3 devuelve
+ 7002: T1 termina de compartir p
+ 9003: T1 solicita compartir q
+11003: T2 solicita acceder
+11003: T2 accede a q
+12003: T2 devuelve
+12004: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 25 segundos
+Se hicieron 4 llamadas a nCompartir
+
+Los mismos testeos de la tarea 4, con timeout que no se vence
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1001: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3002: T1 solicita compartir p
+ 3002: T3 accede a p
+ 3002: T4 accede a p
+ 4002: lanzando T2
+ 4002: T2 solicita acceder
+ 4003: T2 accede a p
+ 5002: T4 devuelve
+ 6003: T2 devuelve
+ 7002: T3 devuelve
+ 7003: T1 termina de compartir p
+ 9003: T1 solicita compartir q
+11003: T2 solicita acceder
+11003: T2 accede a q
+12004: T2 devuelve
+12004: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 25 segundos
+Se hicieron 4 llamadas a nCompartir
+
+Nuevos testeos para timeouts que si se vencen
+nAcceder con timeout que se vence
+T=0 Creando 1 threads
+T=1 esperando thread 0
+T=1 llamada a nAcceder(100) id=0
+T=101 nAcceder id=0 retorna con timeout vencido
+T=101 thread 0 termina
+Ok
+2 nAcceder con timeout que se vencen
+T=0 Creando 2 threads
+T=1 esperando thread 0
+T=1 llamada a nAcceder(300) id=1
+T=101 llamada a nAcceder(100) id=0
+T=201 nAcceder id=0 retorna con timeout vencido
+T=202 thread 0 termina
+T=202 esperando thread 1
+T=301 nAcceder id=1 retorna con timeout vencido
+T=301 thread 1 termina
+Ok
+3 nAcceder con timeout, 2 se vencen, uno no
+T=0 Creando 3 threads
+T=0 llamada a nAcceder(600) id=2
+T=101 llamada a nAcceder(300) id=1
+T=201 llamada a nAcceder(100) id=0
+T=301 nAcceder id=0 retorna con timeout vencido
+T=401 nAcceder id=1 retorna con timeout vencido
+T=501 llamando a nCompartir
+T=501 nAcceder id=2 retorna 
+T=601 nDevolver id=2
+T=601 nCompartir retorna
+T=601 esperando thread 0
+T=601 thread 0 termina
+T=602 esperando thread 1
+T=602 thread 1 termina
+T=602 esperando thread 2
+T=602 thread 2 termina
+Ok
+5 nAcceder con timeout, 3 se vencen, 2 no
+T=0 Creando 5 threads
+T=1 llamada a nAcceder(1000) id=3
+T=101 llamada a nAcceder(900) id=1
+T=201 llamada a nAcceder(400) id=2
+T=301 llamada a nAcceder(400) id=0
+T=401 llamada a nAcceder(400) id=4
+T=602 nAcceder id=2 retorna con timeout vencido
+T=701 nAcceder id=0 retorna con timeout vencido
+T=802 nAcceder id=4 retorna con timeout vencido
+T=901 llamando a nCompartir
+T=901 nAcceder id=1 retorna 
+T=901 nAcceder id=3 retorna 
+T=1002 nDevolver id=1
+T=1102 nDevolver id=3
+T=1102 nCompartir retorna
+T=1102 esperando thread 0
+T=1102 thread 0 termina
+T=1102 esperando thread 1
+T=1102 thread 1 termina
+T=1102 esperando thread 2
+T=1102 thread 2 termina
+T=1102 esperando thread 3
+T=1102 thread 3 termina
+T=1103 esperando thread 4
+T=1103 thread 4 termina
+Ok
+
+Felicitaciones: su tarea funciona correctamente
+Info: Number of cores = 1
+Info: total context changes = 13359
+Info: Implicit context changes = 12406
+==== run-g ===============================
+NTHOBJ=nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -g -c -Wall -Werror -pedantic -std=c18 -Wno-unused-function -Wno-unused-variable -DNTHREADS  nthread.c nutil.c ntime.c pss.c sched-fcfs.c sched-rr.c ncompartir.c sched-pri-1core.c sched-fcfs-1core.c sem.c mutex-cond.c nmsgs.c nStack-amd64.s nsystem.c
+rm -f libnth-g.a
+ar r libnth-g.a nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+ranlib libnth-g.a
+rm nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -g -DNTHREADS -Wall -Werror -pedantic -std=c18 -InKernel test-compartir.c none.c nKernel/libnth-g.a -lm -lpthread -lrt -o test-compartir.nbin-g
+Ejecute con: test-compartir.nbin-g ... opciones ... (-h para help)
+--------------------------------------------
+./test-compartir.nbin-g
+Info: setting single-core FCFS scheduling
+Los mismos testeos de la tarea 4, sin timeout
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1000: T3 solicita acceder
+ 3000: lanzando T1
+ 3000: T1 solicita compartir p
+ 3000: T4 accede a p
+ 3000: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6001: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9001: T1 solicita compartir q
+11001: T2 solicita acceder
+11001: T2 accede a q
+12001: T2 devuelve
+12001: T1 termina de compartir q
 Test del enunciado exitoso
 
 El test de esfuerzo: se crea 1 thread que comparte 'y'.
@@ -52,70 +341,669 @@ Primer test exitoso
 2do. test: se invoca 1 nAcceder antes que nCompartir
 2do. test exitoso
 El test del enunciado
-    1: lanzando T4
-    1: T4 solicita acceder
- 1002: lanzando T3
- 1002: T3 solicita acceder
- 3016: lanzando T1
- 3016: T1 solicita compartir p
- 3016: T4 accede a p
- 3016: T3 accede a p
- 4029: lanzando T2
- 4029: T2 solicita acceder
- 4029: T2 accede a p
- 5030: T4 devuelve
- 6029: T2 devuelve
- 7018: T3 devuelve
- 7018: T1 termina de compartir p
- 9034: T1 solicita compartir q
-11038: T2 solicita acceder
-11038: T2 accede a q
-12047: T2 devuelve
-12048: T1 termina de compartir q
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1001: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3001: T4 accede a p
+ 3001: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6002: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11002: T2 solicita acceder
+11002: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
 Test del enunciado exitoso
 
 El test de esfuerzo: se crea 1 thread que comparte 'y'.
 200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
 Tomo ~ 4 segundos en mi ryzen 5 3550H
-Test de esfuerzo exitoso en 21 segundos
+Test de esfuerzo exitoso en 14 segundos
 Se hicieron 101 llamadas a nCompartir
 
 Nuevos testeos para timeouts que si se vencen
 nAcceder con timeout que se vence
 T=0 Creando 1 threads
-T=1 llamada a nAcceder(100) id=0
-T=1 esperando thread 0
-T=107 nAcceder id=0 retorna con timeout vencido
-T=107 thread 0 termina
+T=0 llamada a nAcceder(100) id=0
+T=0 esperando thread 0
+T=100 nAcceder id=0 retorna con timeout vencido
+T=101 thread 0 termina
 Ok
 2 nAcceder con timeout que se vencen
 T=0 Creando 2 threads
 T=0 llamada a nAcceder(300) id=1
 T=0 esperando thread 0
-T=114 llamada a nAcceder(100) id=0
-T=215 nAcceder id=0 retorna con timeout vencido
-T=216 thread 0 termina
-T=216 esperando thread 1
+T=100 llamada a nAcceder(100) id=0
+T=200 nAcceder id=0 retorna con timeout vencido
+T=200 thread 0 termina
+T=200 esperando thread 1
 T=300 nAcceder id=1 retorna con timeout vencido
 T=300 thread 1 termina
 Ok
 3 nAcceder con timeout, 2 se vencen, uno no
 T=0 Creando 3 threads
 T=0 llamada a nAcceder(600) id=2
-T=101 llamada a nAcceder(300) id=1
-T=210 llamada a nAcceder(100) id=0
-T=346 nAcceder id=0 retorna con timeout vencido
-T=402 nAcceder id=1 retorna con timeout vencido
-T=668 llamando a nCompartir
-T=668 nAcceder id=2 retorna 
-T=783 nDevolver id=2
-T=783 nCompartir retorna
-T=783 esperando thread 0
-T=783 thread 0 termina
-T=783 esperando thread 1
-T=783 thread 1 termina
-T=783 esperando thread 2
-T=783 thread 2 termina
+T=100 llamada a nAcceder(300) id=1
+T=200 llamada a nAcceder(100) id=0
+T=300 nAcceder id=0 retorna con timeout vencido
+T=400 nAcceder id=1 retorna con timeout vencido
+T=500 llamando a nCompartir
+T=500 nAcceder id=2 retorna 
+T=601 nDevolver id=2
+T=601 nCompartir retorna
+T=601 esperando thread 0
+T=601 thread 0 termina
+T=601 esperando thread 1
+T=601 thread 1 termina
+T=601 esperando thread 2
+T=601 thread 2 termina
+Ok
+5 nAcceder con timeout, 3 se vencen, 2 no
+T=0 Creando 5 threads
+T=0 llamada a nAcceder(1000) id=3
+T=100 llamada a nAcceder(900) id=1
+T=200 llamada a nAcceder(400) id=2
+T=300 llamada a nAcceder(400) id=0
+T=400 llamada a nAcceder(400) id=4
+T=600 nAcceder id=2 retorna con timeout vencido
+T=700 nAcceder id=0 retorna con timeout vencido
+T=800 nAcceder id=4 retorna con timeout vencido
+T=900 llamando a nCompartir
+T=900 nAcceder id=3 retorna 
+T=900 nAcceder id=1 retorna 
+T=1001 nDevolver id=1
+T=1101 nDevolver id=3
+T=1101 nCompartir retorna
+T=1101 esperando thread 0
+T=1101 thread 0 termina
+T=1101 esperando thread 1
+T=1101 thread 1 termina
+T=1101 esperando thread 2
+T=1101 thread 2 termina
+T=1101 esperando thread 3
+T=1101 thread 3 termina
+T=1101 esperando thread 4
+T=1101 thread 4 termina
+Ok
+
+Felicitaciones: su tarea funciona correctamente
 Info: Number of cores = 1
-Info: total context changes = 677
+Info: total context changes = 695
 Info: Implicit context changes = 0
+--------------------------------------------
+./test-compartir.nbin-g -ncores 4
+Info: setting 4-core round robin scheduling
+Los mismos testeos de la tarea 4, sin timeout
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3001: T4 accede a p
+ 3001: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6002: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11002: T2 solicita acceder
+11002: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 14 segundos
+Se hicieron 1084 llamadas a nCompartir
+
+Los mismos testeos de la tarea 4, con timeout que no se vence
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1000: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3001: T4 accede a p
+ 3001: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6001: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11002: T2 solicita acceder
+11002: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 14 segundos
+Se hicieron 1851 llamadas a nCompartir
+
+Nuevos testeos para timeouts que si se vencen
+nAcceder con timeout que se vence
+T=0 Creando 1 threads
+T=0 llamada a nAcceder(100) id=0
+T=0 esperando thread 0
+T=100 nAcceder id=0 retorna con timeout vencido
+T=100 thread 0 termina
+Ok
+2 nAcceder con timeout que se vencen
+T=0 Creando 2 threads
+T=0 llamada a nAcceder(300) id=1
+T=0 esperando thread 0
+T=100 llamada a nAcceder(100) id=0
+T=200 nAcceder id=0 retorna con timeout vencido
+T=201 thread 0 termina
+T=201 esperando thread 1
+T=300 nAcceder id=1 retorna con timeout vencido
+T=300 thread 1 termina
+Ok
+3 nAcceder con timeout, 2 se vencen, uno no
+T=0 Creando 3 threads
+T=1 llamada a nAcceder(600) id=2
+T=101 llamada a nAcceder(300) id=1
+T=201 llamada a nAcceder(100) id=0
+T=301 nAcceder id=0 retorna con timeout vencido
+T=401 nAcceder id=1 retorna con timeout vencido
+T=501 llamando a nCompartir
+T=501 nAcceder id=2 retorna 
+T=601 nDevolver id=2
+T=601 nCompartir retorna
+T=601 esperando thread 0
+T=601 thread 0 termina
+T=601 esperando thread 1
+T=601 thread 1 termina
+T=601 esperando thread 2
+T=602 thread 2 termina
+Ok
+5 nAcceder con timeout, 3 se vencen, 2 no
+T=0 Creando 5 threads
+T=0 llamada a nAcceder(1000) id=3
+T=100 llamada a nAcceder(900) id=1
+T=200 llamada a nAcceder(400) id=2
+T=300 llamada a nAcceder(400) id=0
+T=400 llamada a nAcceder(400) id=4
+T=600 nAcceder id=2 retorna con timeout vencido
+T=700 nAcceder id=0 retorna con timeout vencido
+T=800 nAcceder id=4 retorna con timeout vencido
+T=900 llamando a nCompartir
+T=900 nAcceder id=3 retorna 
+T=900 nAcceder id=1 retorna 
+T=1000 nDevolver id=1
+T=1100 nDevolver id=3
+T=1101 nCompartir retorna
+T=1101 esperando thread 0
+T=1101 thread 0 termina
+T=1101 esperando thread 1
+T=1101 thread 1 termina
+T=1101 esperando thread 2
+T=1101 thread 2 termina
+T=1101 esperando thread 3
+T=1101 thread 3 termina
+T=1101 esperando thread 4
+T=1101 thread 4 termina
+Ok
+
+Felicitaciones: su tarea funciona correctamente
+Info: Number of cores = 4
+Info: total context changes = 835
+Info: Implicit context changes = 0
+==== run =================================
+NTHOBJ=nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -O -c -Wall -Werror -pedantic -std=c18 -Wno-unused-function -Wno-unused-variable -DNTHREADS  nthread.c nutil.c ntime.c pss.c sched-fcfs.c sched-rr.c ncompartir.c sched-pri-1core.c sched-fcfs-1core.c sem.c mutex-cond.c nmsgs.c nStack-amd64.s nsystem.c
+rm -f libnth.a
+ar r libnth.a nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+ranlib libnth.a
+rm nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -O -DNTHREADS -Wall -Werror -pedantic -std=c18 -InKernel test-compartir.c none.c nKernel/libnth.a -lm -lpthread -lrt -o test-compartir.nbin
+Ejecute con: test-compartir.nbin ... opciones ... (-h para help)
+--------------------------------------------
+./test-compartir.nbin
+Info: setting single-core FCFS scheduling
+Los mismos testeos de la tarea 4, sin timeout
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1000: T3 solicita acceder
+ 3000: lanzando T1
+ 3000: T1 solicita compartir p
+ 3000: T4 accede a p
+ 3000: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6001: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9001: T1 solicita compartir q
+11001: T2 solicita acceder
+11001: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 13 segundos
+Se hicieron 101 llamadas a nCompartir
+
+Los mismos testeos de la tarea 4, con timeout que no se vence
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1001: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3001: T4 accede a p
+ 3001: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6001: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11002: T2 solicita acceder
+11002: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 13 segundos
+Se hicieron 101 llamadas a nCompartir
+
+Nuevos testeos para timeouts que si se vencen
+nAcceder con timeout que se vence
+T=0 Creando 1 threads
+T=0 llamada a nAcceder(100) id=0
+T=0 esperando thread 0
+T=100 nAcceder id=0 retorna con timeout vencido
+T=100 thread 0 termina
+Ok
+2 nAcceder con timeout que se vencen
+T=0 Creando 2 threads
+T=0 llamada a nAcceder(300) id=1
+T=0 esperando thread 0
+T=100 llamada a nAcceder(100) id=0
+T=201 nAcceder id=0 retorna con timeout vencido
+T=201 thread 0 termina
+T=201 esperando thread 1
+T=300 nAcceder id=1 retorna con timeout vencido
+T=301 thread 1 termina
+Ok
+3 nAcceder con timeout, 2 se vencen, uno no
+T=0 Creando 3 threads
+T=0 llamada a nAcceder(600) id=2
+T=100 llamada a nAcceder(300) id=1
+T=200 llamada a nAcceder(100) id=0
+T=300 nAcceder id=0 retorna con timeout vencido
+T=400 nAcceder id=1 retorna con timeout vencido
+T=500 llamando a nCompartir
+T=500 nAcceder id=2 retorna 
+T=600 nDevolver id=2
+T=600 nCompartir retorna
+T=600 esperando thread 0
+T=600 thread 0 termina
+T=600 esperando thread 1
+T=600 thread 1 termina
+T=600 esperando thread 2
+T=600 thread 2 termina
+Ok
+5 nAcceder con timeout, 3 se vencen, 2 no
+T=0 Creando 5 threads
+T=1 llamada a nAcceder(1000) id=3
+T=101 llamada a nAcceder(900) id=1
+T=201 llamada a nAcceder(400) id=2
+T=301 llamada a nAcceder(400) id=0
+T=401 llamada a nAcceder(400) id=4
+T=601 nAcceder id=2 retorna con timeout vencido
+T=701 nAcceder id=0 retorna con timeout vencido
+T=801 nAcceder id=4 retorna con timeout vencido
+T=901 llamando a nCompartir
+T=901 nAcceder id=3 retorna 
+T=901 nAcceder id=1 retorna 
+T=1001 nDevolver id=1
+T=1101 nDevolver id=3
+T=1101 nCompartir retorna
+T=1101 esperando thread 0
+T=1101 thread 0 termina
+T=1101 esperando thread 1
+T=1101 thread 1 termina
+T=1101 esperando thread 2
+T=1101 thread 2 termina
+T=1101 esperando thread 3
+T=1101 thread 3 termina
+T=1101 esperando thread 4
+T=1101 thread 4 termina
+Ok
+
+Felicitaciones: su tarea funciona correctamente
+Info: Number of cores = 1
+Info: total context changes = 695
+Info: Implicit context changes = 0
+--------------------------------------------
+./test-compartir.nbin -ncores 4
+Info: setting 4-core round robin scheduling
+Los mismos testeos de la tarea 4, sin timeout
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1001: lanzando T3
+ 1001: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3001: T4 accede a p
+ 3001: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4002: T2 accede a p
+ 5001: T4 devuelve
+ 6002: T2 devuelve
+ 7001: T3 devuelve
+ 7002: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11002: T2 solicita acceder
+11002: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 14 segundos
+Se hicieron 3153 llamadas a nCompartir
+
+Los mismos testeos de la tarea 4, con timeout que no se vence
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1000: T3 solicita acceder
+ 3001: lanzando T1
+ 3001: T1 solicita compartir p
+ 3001: T4 accede a p
+ 3001: T3 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6001: T2 devuelve
+ 7001: T3 devuelve
+ 7002: T1 termina de compartir p
+ 9002: T1 solicita compartir q
+11002: T2 solicita acceder
+11002: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 14 segundos
+Se hicieron 536 llamadas a nCompartir
+
+Nuevos testeos para timeouts que si se vencen
+nAcceder con timeout que se vence
+T=0 Creando 1 threads
+T=1 llamada a nAcceder(100) id=0
+T=1 esperando thread 0
+T=101 nAcceder id=0 retorna con timeout vencido
+T=101 thread 0 termina
+Ok
+2 nAcceder con timeout que se vencen
+T=0 Creando 2 threads
+T=0 llamada a nAcceder(300) id=1
+T=0 esperando thread 0
+T=100 llamada a nAcceder(100) id=0
+T=201 nAcceder id=0 retorna con timeout vencido
+T=201 thread 0 termina
+T=201 esperando thread 1
+T=300 nAcceder id=1 retorna con timeout vencido
+T=300 thread 1 termina
+Ok
+3 nAcceder con timeout, 2 se vencen, uno no
+T=0 Creando 3 threads
+T=0 llamada a nAcceder(600) id=2
+T=100 llamada a nAcceder(300) id=1
+T=200 llamada a nAcceder(100) id=0
+T=300 nAcceder id=0 retorna con timeout vencido
+T=400 nAcceder id=1 retorna con timeout vencido
+T=500 llamando a nCompartir
+T=500 nAcceder id=2 retorna 
+T=600 nDevolver id=2
+T=600 nCompartir retorna
+T=600 esperando thread 0
+T=600 thread 0 termina
+T=600 esperando thread 1
+T=600 thread 1 termina
+T=600 esperando thread 2
+T=600 thread 2 termina
+Ok
+5 nAcceder con timeout, 3 se vencen, 2 no
+T=0 Creando 5 threads
+T=0 llamada a nAcceder(1000) id=3
+T=100 llamada a nAcceder(900) id=1
+T=200 llamada a nAcceder(400) id=2
+T=300 llamada a nAcceder(400) id=0
+T=400 llamada a nAcceder(400) id=4
+T=600 nAcceder id=2 retorna con timeout vencido
+T=700 nAcceder id=0 retorna con timeout vencido
+T=800 nAcceder id=4 retorna con timeout vencido
+T=900 llamando a nCompartir
+T=900 nAcceder id=3 retorna 
+T=900 nAcceder id=1 retorna 
+T=1000 nDevolver id=1
+T=1100 nDevolver id=3
+T=1100 nCompartir retorna
+T=1100 esperando thread 0
+T=1101 thread 0 termina
+T=1101 esperando thread 1
+T=1101 thread 1 termina
+T=1101 esperando thread 2
+T=1101 thread 2 termina
+T=1101 esperando thread 3
+T=1101 thread 3 termina
+T=1101 esperando thread 4
+T=1101 thread 4 termina
+Ok
+
+Felicitaciones: su tarea funciona correctamente
+Info: Number of cores = 4
+Info: total context changes = 867
+Info: Implicit context changes = 0
+--------------------------------------------
+./test-compartir.nbin -slice 1
+Info: setting 1-core round robin scheduling
+Los mismos testeos de la tarea 4, sin timeout
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1000: T3 solicita acceder
+ 3000: lanzando T1
+ 3000: T1 solicita compartir p
+ 3000: T3 accede a p
+ 3000: T4 accede a p
+ 4000: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6001: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9001: T1 solicita compartir q
+11001: T2 solicita acceder
+11001: T2 accede a q
+12001: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 14 segundos
+Se hicieron 2 llamadas a nCompartir
+
+Los mismos testeos de la tarea 4, con timeout que no se vence
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1000: lanzando T3
+ 1000: T3 solicita acceder
+ 3000: lanzando T1
+ 3001: T1 solicita compartir p
+ 3001: T3 accede a p
+ 3001: T4 accede a p
+ 4001: lanzando T2
+ 4001: T2 solicita acceder
+ 4001: T2 accede a p
+ 5001: T4 devuelve
+ 6001: T2 devuelve
+ 7001: T3 devuelve
+ 7001: T1 termina de compartir p
+ 9001: T1 solicita compartir q
+11001: T2 solicita acceder
+11001: T2 accede a q
+12002: T2 devuelve
+12002: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 14 segundos
+Se hicieron 4 llamadas a nCompartir
+
+Nuevos testeos para timeouts que si se vencen
+nAcceder con timeout que se vence
+T=0 Creando 1 threads
+T=1 esperando thread 0
+T=1 llamada a nAcceder(100) id=0
+T=101 nAcceder id=0 retorna con timeout vencido
+T=101 thread 0 termina
+Ok
+2 nAcceder con timeout que se vencen
+T=0 Creando 2 threads
+T=0 esperando thread 0
+T=0 llamada a nAcceder(300) id=1
+T=100 llamada a nAcceder(100) id=0
+T=201 nAcceder id=0 retorna con timeout vencido
+T=201 thread 0 termina
+T=201 esperando thread 1
+T=301 nAcceder id=1 retorna con timeout vencido
+T=301 thread 1 termina
+Ok
+3 nAcceder con timeout, 2 se vencen, uno no
+T=0 Creando 3 threads
+T=0 llamada a nAcceder(600) id=2
+T=100 llamada a nAcceder(300) id=1
+T=200 llamada a nAcceder(100) id=0
+T=300 nAcceder id=0 retorna con timeout vencido
+T=400 nAcceder id=1 retorna con timeout vencido
+T=500 llamando a nCompartir
+T=500 nAcceder id=2 retorna 
+T=600 nDevolver id=2
+T=600 nCompartir retorna
+T=600 esperando thread 0
+T=600 thread 0 termina
+T=600 esperando thread 1
+T=600 thread 1 termina
+T=600 esperando thread 2
+T=600 thread 2 termina
+Ok
+5 nAcceder con timeout, 3 se vencen, 2 no
+T=0 Creando 5 threads
+T=0 llamada a nAcceder(1000) id=3
+T=100 llamada a nAcceder(900) id=1
+T=200 llamada a nAcceder(400) id=2
+T=300 llamada a nAcceder(400) id=0
+T=400 llamada a nAcceder(400) id=4
+T=600 nAcceder id=2 retorna con timeout vencido
+T=700 nAcceder id=0 retorna con timeout vencido
+T=800 nAcceder id=4 retorna con timeout vencido
+T=900 llamando a nCompartir
+T=900 nAcceder id=1 retorna 
+T=900 nAcceder id=3 retorna 
+T=1000 nDevolver id=1
+T=1100 nDevolver id=3
+T=1100 nCompartir retorna
+T=1100 esperando thread 0
+T=1100 thread 0 termina
+T=1100 esperando thread 1
+T=1100 thread 1 termina
+T=1100 esperando thread 2
+T=1100 thread 2 termina
+T=1100 esperando thread 3
+T=1101 thread 3 termina
+T=1101 esperando thread 4
+T=1101 thread 4 termina
+Ok
+
+Felicitaciones: su tarea funciona correctamente
+Info: Number of cores = 1
+Info: total context changes = 7554
+Info: Implicit context changes = 6600
