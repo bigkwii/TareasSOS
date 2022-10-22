@@ -1,0 +1,121 @@
+Sistema operativo utilizado
+Linux debian11mate 5.10.0-19-amd64 #1 SMP Debian 5.10.149-1 (2022-10-17) x86_64 GNU/Linux
+==== run-san =============================
+NTHOBJ=nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -g -c -fsanitize=address -fsanitize=undefined -DSANITIZE -Wall -Werror -pedantic -std=c18 -Wno-unused-function -Wno-unused-variable -DNTHREADS  nthread.c nutil.c ntime.c pss.c sched-fcfs.c sched-rr.c ncompartir.c sched-pri-1core.c sched-fcfs-1core.c sem.c mutex-cond.c nmsgs.c nStack-amd64.s nsystem.c
+rm -f libnth-san.a
+ar r libnth-san.a nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+ranlib libnth-san.a
+rm nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o ncompartir.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -g -fsanitize=address -fsanitize=undefined -DSAN -DNTHREADS -Wall -Werror -pedantic -std=c18 -InKernel test-compartir.c none.c nKernel/libnth-san.a -lm -lpthread -lrt -o test-compartir.nbin-san
+Ejecute con: test-compartir.nbin-san ... opciones ... (-h para help)
+--------------------------------------------
+./test-compartir.nbin-san
+Info: setting single-core FCFS scheduling
+Los mismos testeos de la tarea 4, sin timeout
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    0: lanzando T4
+    0: T4 solicita acceder
+ 1004: lanzando T3
+ 1004: T3 solicita acceder
+ 3007: lanzando T1
+ 3007: T1 solicita compartir p
+ 3007: T4 accede a p
+ 3007: T3 accede a p
+ 4008: lanzando T2
+ 4008: T2 solicita acceder
+ 4008: T2 accede a p
+ 5007: T4 devuelve
+ 6009: T2 devuelve
+ 7008: T3 devuelve
+ 7008: T1 termina de compartir p
+ 9012: T1 solicita compartir q
+11009: T2 solicita acceder
+11009: T2 accede a q
+12013: T2 devuelve
+12013: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 14 segundos
+Se hicieron 101 llamadas a nCompartir
+
+Los mismos testeos de la tarea 4, con timeout que no se vence
+Primer test: se invoca 1 nAcceder despues de nCompartir
+Primer test exitoso
+2do. test: se invoca 1 nAcceder antes que nCompartir
+2do. test exitoso
+El test del enunciado
+    1: lanzando T4
+    1: T4 solicita acceder
+ 1002: lanzando T3
+ 1002: T3 solicita acceder
+ 3016: lanzando T1
+ 3016: T1 solicita compartir p
+ 3016: T4 accede a p
+ 3016: T3 accede a p
+ 4029: lanzando T2
+ 4029: T2 solicita acceder
+ 4029: T2 accede a p
+ 5030: T4 devuelve
+ 6029: T2 devuelve
+ 7018: T3 devuelve
+ 7018: T1 termina de compartir p
+ 9034: T1 solicita compartir q
+11038: T2 solicita acceder
+11038: T2 accede a q
+12047: T2 devuelve
+12048: T1 termina de compartir q
+Test del enunciado exitoso
+
+El test de esfuerzo: se crea 1 thread que comparte 'y'.
+200 threads que acceden 30000 veces.  No debe ocurrir un deadlock.
+Tomo ~ 4 segundos en mi ryzen 5 3550H
+Test de esfuerzo exitoso en 21 segundos
+Se hicieron 101 llamadas a nCompartir
+
+Nuevos testeos para timeouts que si se vencen
+nAcceder con timeout que se vence
+T=0 Creando 1 threads
+T=1 llamada a nAcceder(100) id=0
+T=1 esperando thread 0
+T=107 nAcceder id=0 retorna con timeout vencido
+T=107 thread 0 termina
+Ok
+2 nAcceder con timeout que se vencen
+T=0 Creando 2 threads
+T=0 llamada a nAcceder(300) id=1
+T=0 esperando thread 0
+T=114 llamada a nAcceder(100) id=0
+T=215 nAcceder id=0 retorna con timeout vencido
+T=216 thread 0 termina
+T=216 esperando thread 1
+T=300 nAcceder id=1 retorna con timeout vencido
+T=300 thread 1 termina
+Ok
+3 nAcceder con timeout, 2 se vencen, uno no
+T=0 Creando 3 threads
+T=0 llamada a nAcceder(600) id=2
+T=101 llamada a nAcceder(300) id=1
+T=210 llamada a nAcceder(100) id=0
+T=346 nAcceder id=0 retorna con timeout vencido
+T=402 nAcceder id=1 retorna con timeout vencido
+T=668 llamando a nCompartir
+T=668 nAcceder id=2 retorna 
+T=783 nDevolver id=2
+T=783 nCompartir retorna
+T=783 esperando thread 0
+T=783 thread 0 termina
+T=783 esperando thread 1
+T=783 thread 1 termina
+T=783 esperando thread 2
+T=783 thread 2 termina
+Info: Number of cores = 1
+Info: total context changes = 677
+Info: Implicit context changes = 0
