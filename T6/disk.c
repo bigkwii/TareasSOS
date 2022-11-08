@@ -51,6 +51,13 @@ void iniDisk(void) {
 void requestDisk(int track) {
   // ...
   spinLock(buffer->mutex);
+  if ((buffer->lastT) == NULL) {
+    buffer->lastT = &track;
+  }
+  if(track == *(buffer->lastT)){
+    spinUnlock(buffer->mutex);
+    return;
+  }
   if (track > *(buffer->lastT)) {
     priPut(buffer->qUp, (void *)&track, track);
   } else {
