@@ -1,0 +1,8 @@
+Info: setting single-core FCFS scheduling
+
+===============================
+Test de robustez non preemptive
+Verifica exclusion mutua y orden
+20 lectores de disco
+===============================
+
