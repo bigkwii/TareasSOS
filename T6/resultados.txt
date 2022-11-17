@@ -1,0 +1,123 @@
+Sistema operativo utilizado
+Linux debian11mate 5.10.0-19-amd64 #1 SMP Debian 5.10.149-2 (2022-10-21) x86_64 GNU/Linux
+==== run-san =============================
+Test con pthreads usando spin-locks que esperan con busy-waiting
+gcc -g -fsanitize=address -fsanitize=undefined -DSAN -Wall -Werror -pedantic -std=c18 -InKernel disk.c test-disk.c priqueue.c spinlocks.c swap.s  -lm -lpthread -o disk.pbin-san
+Ejecute con: disk.pbin-san
+./disk.pbin-san
+
+===============================
+Test unitarios
+===============================
+
+--- Primer test: un solo lector de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+--- 2do. test: 2 lectores de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: juan libera disco
+--- 3er. test: 3 lectores de disco ordenados ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+--- 4to. test: 3 lectores de disco desordenados ---
+Secuencia esperada:
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+--- 5to. test: test del enunciado ---
+Secuencia esperada:
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: ana obtiene pista 6
+9: ana libera disco
+9: diego obtiene pista 10
+10: diego libera disco
+10: silvia obtiene pista 1
+11: silvia libera disco
+11: paco obtiene pista 2
+12: paco libera disco
+12: juan obtiene pista 3
+13: juan libera disco
+13: maria obtiene pista 4
+14: maria libera disco

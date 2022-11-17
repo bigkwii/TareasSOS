@@ -77,7 +77,7 @@ static void pausa(int tiempo_espera) { // tiempo_espera en centesimas de segundo
   pthread_mutex_lock(&t_mutex);
   int tiempo_inicio= tiempo_actual;
   pthread_mutex_unlock(&t_mutex);
-  sleep_millis(tiempo_espera*300);
+  sleep_millis(tiempo_espera*600);
   pthread_mutex_lock(&t_mutex);
   tiempo_actual= tiempo_inicio+tiempo_espera;
   pthread_mutex_unlock(&t_mutex);
@@ -99,7 +99,10 @@ static pthread_t crearLector(char *nom, int track, int tiempo_estadia,
   ArgLector args= {nom, track, tiempo_estadia, pt};
   sem_init(&args.sem, 0, 0);
   pthread_t t;
-  pthread_create(&t, NULL, lector, &args);
+  if (pthread_create(&t, NULL, lector, &args)!=0) {
+    perror("pthread_create");
+    exit(1);
+  }
   sem_wait(&args.sem);
   sem_destroy(&args.sem);
   return t;
@@ -501,7 +504,10 @@ static pthread_t crearLector2(char *nom, int track, int ciclos) {
   ArgLector23 args= {nom, track, ciclos};
   sem_init(&args.sem, 0, 0);
   pthread_t t;
-  pthread_create(&t, NULL, lector2, &args);
+  if (pthread_create(&t, NULL, lector2, &args)!=0) {
+    perror("pthread_create");
+    exit(1);
+  }
   sem_wait(&args.sem);
   sem_destroy(&args.sem);
   return t;
@@ -610,7 +616,10 @@ static pthread_t crearLector3(char *nom, int track, int ciclos) {
   ArgLector23 args= {nom, track, ciclos};
   sem_init(&args.sem, 0, 0);
   pthread_t t;
-  pthread_create(&t, NULL, lector3, &args);
+  if (pthread_create(&t, NULL, lector3, &args)!=0) {
+    perror("pthread_create");
+    exit(1);
+  }
   sem_wait(&args.sem);
   sem_destroy(&args.sem);
   return t;

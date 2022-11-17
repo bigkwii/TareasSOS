@@ -1,3 +1,4 @@
+#define _GNU_SOURCE 1
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -12,12 +13,46 @@
 
 int swapInt(volatile int *psl, int status); // en archivo swap.s
 
+#if 0
+
+// Implementacion verdadera de un spinlock para una maquina sin sistema
+// operativo
+
 void spinLock(volatile int *psl) {
   do {
+
     while (*psl==CLOSED)
       ;
+
   } while (swapInt(psl, CLOSED)==CLOSED);
 }
+
+#else
+
+// Implementacion corregida para que funcione mejor cuando los cores son
+// simulados con pthreads.  La idea es que hace busy-waiting por un numero
+// acotados de ciclos y luego invoca pthread_yield para darle oportunidad
+// a otro thread de ejecutar
+
+#define NITER 100000
+
+__thread volatile int spinlocks_cnt;
+
+void spinLock(volatile int *psl) {
+  do {
+
+    if (*psl==CLOSED) {
+      spinlocks_cnt= 0;
+      do {
+        if (spinlocks_cnt++ % NITER == 0)
+          pthread_yield();
+      } while (*psl==CLOSED);
+    }
+
+  } while (swapInt(psl, CLOSED)==CLOSED);
+}
+
+#endif
 
 void spinUnlock(int *psl) {
   *psl= OPEN;

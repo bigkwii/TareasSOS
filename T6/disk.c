@@ -14,67 +14,75 @@
 // el patron request.  Puede substituir los semaforos de esas soluciones
 // por spin-locks, porque esos semaforos almacenan a lo mas una sola ficha.
 
+// usando c-scan o el elevator algorithm
 
 // Declare los tipos que necesite
 // ...
-// Buffer
-typedef struct {
-  int * lastT;
-  PriQueue *qUp;
-  PriQueue *qDown;
-  int * mutex;
-} Buffer;
+// estados 
+#define TRUE 1
+#define FALSE 0
+enum {IDLE, BUSY}; 
 
 // Declare aca las variables globales que necesite
 // ...
-int mutex; // spinLock = wait, spinUnlock = post
-PriQueue * qUp;
-PriQueue * qDown;
-static int lastT;
-Buffer * buffer;
+int mutex;
+static int state;
+static int currentT;
+static PriQueue *qUp;
+static PriQueue *qDown;
 
 // Agregue aca las funciones requestDisk y releaseDisk
 
 void iniDisk(void) {
   // ...
-  buffer = malloc(sizeof(Buffer));
-  buffer->lastT = &lastT;
-  buffer->qUp = qUp;
-  buffer->qDown = qDown;
-  buffer->mutex = &mutex;
-
+  mutex = OPEN;
+  state = IDLE;
+  currentT = 0;
   qUp = makePriQueue();
   qDown = makePriQueue();
-  mutex = OPEN;
 }
 
 void requestDisk(int track) {
   // ...
-  spinLock(buffer->mutex);
-  if ((buffer->lastT) == NULL) {
-    buffer->lastT = &track;
-  }
-  if(track == *(buffer->lastT)){
-    spinUnlock(buffer->mutex);
+  spinLock(&mutex);
+  if (state != IDLE){
+    int w = CLOSED; // wait spinlock
+    if (track > currentT){
+      priPut(qUp, &w, track);
+    } else {
+      priPut(qDown, &w, track);
+    }
+    spinUnlock(&mutex);
+    spinLock(&w);
     return;
   }
-  if (track > *(buffer->lastT)) {
-    priPut(buffer->qUp, (void *)&track, track);
-  } else {
-    priPut(buffer->qDown, (void *)&track, track);
-  }
-  spinUnlock(buffer->mutex);
+  state = BUSY;
+  currentT = track;
+  spinUnlock(&mutex);
+  return;
 }
 
 void releaseDisk() {
   // ...
-  spinLock(buffer->mutex);
-  if (emptyPriQueue(buffer->qUp)) {
-    *(buffer->lastT) = priBest(buffer->qDown);
-    priGet(buffer->qDown);
+  spinLock(&mutex);
+  if(!emptyPriQueue(qUp)){
+    currentT = priBest(qUp);
+    int *w = priGet(qUp);
+    spinUnlock(w);
+  } else if(!emptyPriQueue(qDown)){
+    currentT = priBest(qDown);
+    int *w = priGet(qDown);
+    // now we gotta put all the remaining tracks in the other queue
+    while(!emptyPriQueue(qDown)){
+      int w_track = priBest(qDown); // track of the node
+      int *w_ = priGet(qDown); // wait spinlock of the node
+      priPut(qUp, w_, w_track);
+    }
+    spinUnlock(w);
   } else {
-    *(buffer->lastT) = priBest(buffer->qUp);
-    priGet(buffer->qUp);
+    state = IDLE;
+    currentT = 0;
   }
-  spinUnlock(buffer->mutex);
+  spinUnlock(&mutex);
+  return;
 }
