@@ -47,7 +47,7 @@ void requestDisk(int track) {
   spinLock(&mutex);
   if (state != IDLE){
     int w = CLOSED; // wait spinlock
-    if (track > currentT){
+    if (track >= currentT){
       priPut(qUp, &w, track);
     } else {
       priPut(qDown, &w, track);
@@ -70,18 +70,16 @@ void releaseDisk() {
     int *w = priGet(qUp);
     spinUnlock(w);
   } else if(!emptyPriQueue(qDown)){
-    currentT = priBest(qDown);
-    int *w = priGet(qDown);
-    // now we gotta put all the remaining tracks in the other queue
+    currentT = 0;
+    // put them all in qUp
     while(!emptyPriQueue(qDown)){
       int w_track = priBest(qDown); // track of the node
       int *w_ = priGet(qDown); // wait spinlock of the node
       priPut(qUp, w_, w_track);
-
     }
+    currentT = priBest(qUp);
+    int *w = priGet(qUp);
     spinUnlock(w);
-    spinUnlock(&mutex);
-    return;
   } else {
     state = IDLE;
     currentT = 0;

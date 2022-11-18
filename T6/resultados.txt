@@ -109,15 +109,1142 @@ Secuencia obtenida =========>
 6: silvia solicita pista 1
 7: diego solicita pista 10
 8: pedro libera disco
-8: ana obtiene pista 6
-9: ana libera disco
-9: diego obtiene pista 10
-10: diego libera disco
-10: silvia obtiene pista 1
-11: silvia libera disco
-11: paco obtiene pista 2
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+--- 6to. test: 8 lectores  ---
+Secuencia esperada:
+1: pedro solicita pista 5
+1: pedro obtiene pista 5    (Trk=4)
+2: juan solicita pista 3    (Trk=4 Q=juan:3)
+3: ana solicita pista 7     (Trk=4 Q=ana:7 juan:3)
+4: paco solicita pista 1    (Trk=4 Q=ana:7 paco:1 juan:3)
+5: pedro libera disco
+5: ana obtiene pista 7      (Trk=7 Q=paco:1 juan:3)
+6: maria solicita pista 8   (Trk=7 Q=maria:8 paco:1 juan:3)
+7: silvia solicita pista 2  (Trk=7 Q=maria:8 paco:1 silvia:2 juan:3)
+8: ana libera disco
+8: maria obtiene pista 8    (Trk=8 Q=paco:1 silvia:2 j:3)
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4  (Trk=1 Q=silvia:2 juan:3 diego:4)
+11: sonia solicita pista 6  (Trk=1 Q=silvia:2 juan:3 diego:4 sonia:6)
 12: paco libera disco
-12: juan obtiene pista 3
-13: juan libera disco
-13: maria obtiene pista 4
-14: maria libera disco
+12: silvia obtiene pista 2  (Trk=2 Q=juan:3 diego:4 sonia:6)
+13: silvia libera disco
+13: juan obtiene pista 3    (Trk=3 diego:4 sonia:6)
+14: juan libera disco
+14: diego obtiene pista 4   (Trk=4 sonia:6)
+15: diego libera disco
+15: sonia obtiene pista 6   (Trk=6 Q=)
+16: sonia libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 5
+1: pedro obtiene pista 5
+2: juan solicita pista 3
+3: ana solicita pista 7
+4: paco solicita pista 1
+5: pedro libera disco
+5: ana obtiene pista 7
+6: maria solicita pista 8
+7: silvia solicita pista 2
+8: ana libera disco
+8: maria obtiene pista 8
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4
+11: sonia solicita pista 6
+12: paco libera disco
+12: silvia obtiene pista 2
+13: silvia libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+14: diego obtiene pista 4
+15: diego libera disco
+15: sonia obtiene pista 6
+16: sonia libera disco
+Aprobado
+
+===============================
+Test de robustez preemptive
+Solo verifica la exclusion mutua
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+100 iteraciones completadas en lector 0 de 100
+Aprobado
+Felicitaciones: paso todos los tests.
+Test con nthreads con spin-locks basados en mutex/condiciones
+El scheduling es non preemtive last come first served
+cd nKernel
+NTHOBJ=nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -g -c -fsanitize=address -fsanitize=undefined -DSANITIZE -Wall -Werror -pedantic -std=c18 -Wno-unused-function -Wno-unused-variable -DNTHREADS  nthread.c nutil.c ntime.c pss.c sched-fcfs.c sched-rr.c sched-lcfs1.c sched-pri-1core.c sched-fcfs-1core.c sem.c mutex-cond.c nmsgs.c nStack-amd64.s nsystem.c
+rm -f libnth-san.a
+ar r libnth-san.a nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+ranlib libnth-san.a
+rm nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+cd ..
+gcc -g -fsanitize=address -fsanitize=undefined -DSAN -DNTHREADS -Wall -Werror -pedantic -std=c18 -InKernel disk.c test-disk.c priqueue.c spinlocks.c swap.s nKernel/libnth-san.a -lm -lpthread -lrt -o disk.nbin-san
+Ejecute con: disk.nbin-san ... opciones ... (-h para help)
+./disk.nbin-san -lcfs1
+Info: setting single-core LCFS scheduling
+
+===============================
+Test unitarios
+===============================
+
+--- Primer test: un solo lector de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+--- 2do. test: 2 lectores de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: juan libera disco
+--- 3er. test: 3 lectores de disco ordenados ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+--- 4to. test: 3 lectores de disco desordenados ---
+Secuencia esperada:
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+--- 5to. test: test del enunciado ---
+Secuencia esperada:
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+--- 6to. test: 8 lectores  ---
+Secuencia esperada:
+1: pedro solicita pista 5
+1: pedro obtiene pista 5    (Trk=4)
+2: juan solicita pista 3    (Trk=4 Q=juan:3)
+3: ana solicita pista 7     (Trk=4 Q=ana:7 juan:3)
+4: paco solicita pista 1    (Trk=4 Q=ana:7 paco:1 juan:3)
+5: pedro libera disco
+5: ana obtiene pista 7      (Trk=7 Q=paco:1 juan:3)
+6: maria solicita pista 8   (Trk=7 Q=maria:8 paco:1 juan:3)
+7: silvia solicita pista 2  (Trk=7 Q=maria:8 paco:1 silvia:2 juan:3)
+8: ana libera disco
+8: maria obtiene pista 8    (Trk=8 Q=paco:1 silvia:2 j:3)
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4  (Trk=1 Q=silvia:2 juan:3 diego:4)
+11: sonia solicita pista 6  (Trk=1 Q=silvia:2 juan:3 diego:4 sonia:6)
+12: paco libera disco
+12: silvia obtiene pista 2  (Trk=2 Q=juan:3 diego:4 sonia:6)
+13: silvia libera disco
+13: juan obtiene pista 3    (Trk=3 diego:4 sonia:6)
+14: juan libera disco
+14: diego obtiene pista 4   (Trk=4 sonia:6)
+15: diego libera disco
+15: sonia obtiene pista 6   (Trk=6 Q=)
+16: sonia libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 5
+1: pedro obtiene pista 5
+2: juan solicita pista 3
+3: ana solicita pista 7
+4: paco solicita pista 1
+5: pedro libera disco
+5: ana obtiene pista 7
+6: maria solicita pista 8
+7: silvia solicita pista 2
+8: ana libera disco
+8: maria obtiene pista 8
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4
+11: sonia solicita pista 6
+12: paco libera disco
+12: silvia obtiene pista 2
+13: silvia libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+14: diego obtiene pista 4
+15: diego libera disco
+15: sonia obtiene pista 6
+16: sonia libera disco
+Aprobado
+
+===============================
+Test de robustez preemptive
+Solo verifica la exclusion mutua
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+100 iteraciones completadas en lector 0 de 100
+Aprobado
+
+===============================
+Test de robustez non preemptive
+Verifica exclusion mutua y orden
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+Nro. de threads: 20
+Total solicitudes: 2000
+Largo promedio de la cola del disco: 3.536425
+Aprobado
+Felicitaciones: paso todos los tests.
+Info: Number of cores = 1
+Info: total context changes = 31127
+Info: Implicit context changes = 0
+==== run-g ===============================
+Test con pthreads usando spin-locks que esperan con busy-waiting
+gcc -g -Wall -Werror -pedantic -std=c18 -InKernel disk.c test-disk.c priqueue.c spinlocks.c swap.s -lm -lpthread -o disk.pbin-g
+Ejecute con: disk.pbin-g
+./disk.pbin-g
+
+===============================
+Test unitarios
+===============================
+
+--- Primer test: un solo lector de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+--- 2do. test: 2 lectores de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: juan libera disco
+--- 3er. test: 3 lectores de disco ordenados ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+--- 4to. test: 3 lectores de disco desordenados ---
+Secuencia esperada:
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+--- 5to. test: test del enunciado ---
+Secuencia esperada:
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+--- 6to. test: 8 lectores  ---
+Secuencia esperada:
+1: pedro solicita pista 5
+1: pedro obtiene pista 5    (Trk=4)
+2: juan solicita pista 3    (Trk=4 Q=juan:3)
+3: ana solicita pista 7     (Trk=4 Q=ana:7 juan:3)
+4: paco solicita pista 1    (Trk=4 Q=ana:7 paco:1 juan:3)
+5: pedro libera disco
+5: ana obtiene pista 7      (Trk=7 Q=paco:1 juan:3)
+6: maria solicita pista 8   (Trk=7 Q=maria:8 paco:1 juan:3)
+7: silvia solicita pista 2  (Trk=7 Q=maria:8 paco:1 silvia:2 juan:3)
+8: ana libera disco
+8: maria obtiene pista 8    (Trk=8 Q=paco:1 silvia:2 j:3)
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4  (Trk=1 Q=silvia:2 juan:3 diego:4)
+11: sonia solicita pista 6  (Trk=1 Q=silvia:2 juan:3 diego:4 sonia:6)
+12: paco libera disco
+12: silvia obtiene pista 2  (Trk=2 Q=juan:3 diego:4 sonia:6)
+13: silvia libera disco
+13: juan obtiene pista 3    (Trk=3 diego:4 sonia:6)
+14: juan libera disco
+14: diego obtiene pista 4   (Trk=4 sonia:6)
+15: diego libera disco
+15: sonia obtiene pista 6   (Trk=6 Q=)
+16: sonia libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 5
+1: pedro obtiene pista 5
+2: juan solicita pista 3
+3: ana solicita pista 7
+4: paco solicita pista 1
+5: pedro libera disco
+5: ana obtiene pista 7
+6: maria solicita pista 8
+7: silvia solicita pista 2
+8: ana libera disco
+8: maria obtiene pista 8
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4
+11: sonia solicita pista 6
+12: paco libera disco
+12: silvia obtiene pista 2
+13: silvia libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+14: diego obtiene pista 4
+15: diego libera disco
+15: sonia obtiene pista 6
+16: sonia libera disco
+Aprobado
+
+===============================
+Test de robustez preemptive
+Solo verifica la exclusion mutua
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+100 iteraciones completadas en lector 0 de 100
+Aprobado
+Felicitaciones: paso todos los tests.
+Test con nthreads con spin-locks basados en mutex/condiciones
+El scheduling es non preemtive last come first served
+cd nKernel
+NTHOBJ=nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -g -c -Wall -Werror -pedantic -std=c18 -Wno-unused-function -Wno-unused-variable -DNTHREADS  nthread.c nutil.c ntime.c pss.c sched-fcfs.c sched-rr.c sched-lcfs1.c sched-pri-1core.c sched-fcfs-1core.c sem.c mutex-cond.c nmsgs.c nStack-amd64.s nsystem.c
+rm -f libnth-g.a
+ar r libnth-g.a nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+ranlib libnth-g.a
+rm nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+cd ..
+gcc -g -DNTHREADS -Wall -Werror -pedantic -std=c18 -InKernel disk.c test-disk.c priqueue.c spinlocks.c swap.s nKernel/libnth-g.a -lm -lpthread -lrt -o disk.nbin-g
+Ejecute con: disk.nbin-g ... opciones ... (-h para help)
+./disk.nbin-g -lcfs1
+Info: setting single-core LCFS scheduling
+
+===============================
+Test unitarios
+===============================
+
+--- Primer test: un solo lector de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+--- 2do. test: 2 lectores de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: juan libera disco
+--- 3er. test: 3 lectores de disco ordenados ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+--- 4to. test: 3 lectores de disco desordenados ---
+Secuencia esperada:
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+--- 5to. test: test del enunciado ---
+Secuencia esperada:
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+--- 6to. test: 8 lectores  ---
+Secuencia esperada:
+1: pedro solicita pista 5
+1: pedro obtiene pista 5    (Trk=4)
+2: juan solicita pista 3    (Trk=4 Q=juan:3)
+3: ana solicita pista 7     (Trk=4 Q=ana:7 juan:3)
+4: paco solicita pista 1    (Trk=4 Q=ana:7 paco:1 juan:3)
+5: pedro libera disco
+5: ana obtiene pista 7      (Trk=7 Q=paco:1 juan:3)
+6: maria solicita pista 8   (Trk=7 Q=maria:8 paco:1 juan:3)
+7: silvia solicita pista 2  (Trk=7 Q=maria:8 paco:1 silvia:2 juan:3)
+8: ana libera disco
+8: maria obtiene pista 8    (Trk=8 Q=paco:1 silvia:2 j:3)
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4  (Trk=1 Q=silvia:2 juan:3 diego:4)
+11: sonia solicita pista 6  (Trk=1 Q=silvia:2 juan:3 diego:4 sonia:6)
+12: paco libera disco
+12: silvia obtiene pista 2  (Trk=2 Q=juan:3 diego:4 sonia:6)
+13: silvia libera disco
+13: juan obtiene pista 3    (Trk=3 diego:4 sonia:6)
+14: juan libera disco
+14: diego obtiene pista 4   (Trk=4 sonia:6)
+15: diego libera disco
+15: sonia obtiene pista 6   (Trk=6 Q=)
+16: sonia libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 5
+1: pedro obtiene pista 5
+2: juan solicita pista 3
+3: ana solicita pista 7
+4: paco solicita pista 1
+5: pedro libera disco
+5: ana obtiene pista 7
+6: maria solicita pista 8
+7: silvia solicita pista 2
+8: ana libera disco
+8: maria obtiene pista 8
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4
+11: sonia solicita pista 6
+12: paco libera disco
+12: silvia obtiene pista 2
+13: silvia libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+14: diego obtiene pista 4
+15: diego libera disco
+15: sonia obtiene pista 6
+16: sonia libera disco
+Aprobado
+
+===============================
+Test de robustez preemptive
+Solo verifica la exclusion mutua
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+100 iteraciones completadas en lector 0 de 100
+Aprobado
+
+===============================
+Test de robustez non preemptive
+Verifica exclusion mutua y orden
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+Nro. de threads: 20
+Total solicitudes: 2000
+Largo promedio de la cola del disco: 3.536425
+Aprobado
+Felicitaciones: paso todos los tests.
+Info: Number of cores = 1
+Info: total context changes = 31127
+Info: Implicit context changes = 0
+==== run =================================
+Test con pthreads usando spin-locks que esperan con busy-waiting
+gcc -g -Wall -Werror -pedantic -std=c18 -InKernel disk.c test-disk.c priqueue.c spinlocks.c swap.s  -lm -lpthread -o disk.pbin
+Ejecute con: disk.pbin
+./disk.pbin
+
+===============================
+Test unitarios
+===============================
+
+--- Primer test: un solo lector de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+--- 2do. test: 2 lectores de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: juan libera disco
+--- 3er. test: 3 lectores de disco ordenados ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+--- 4to. test: 3 lectores de disco desordenados ---
+Secuencia esperada:
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+--- 5to. test: test del enunciado ---
+Secuencia esperada:
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+--- 6to. test: 8 lectores  ---
+Secuencia esperada:
+1: pedro solicita pista 5
+1: pedro obtiene pista 5    (Trk=4)
+2: juan solicita pista 3    (Trk=4 Q=juan:3)
+3: ana solicita pista 7     (Trk=4 Q=ana:7 juan:3)
+4: paco solicita pista 1    (Trk=4 Q=ana:7 paco:1 juan:3)
+5: pedro libera disco
+5: ana obtiene pista 7      (Trk=7 Q=paco:1 juan:3)
+6: maria solicita pista 8   (Trk=7 Q=maria:8 paco:1 juan:3)
+7: silvia solicita pista 2  (Trk=7 Q=maria:8 paco:1 silvia:2 juan:3)
+8: ana libera disco
+8: maria obtiene pista 8    (Trk=8 Q=paco:1 silvia:2 j:3)
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4  (Trk=1 Q=silvia:2 juan:3 diego:4)
+11: sonia solicita pista 6  (Trk=1 Q=silvia:2 juan:3 diego:4 sonia:6)
+12: paco libera disco
+12: silvia obtiene pista 2  (Trk=2 Q=juan:3 diego:4 sonia:6)
+13: silvia libera disco
+13: juan obtiene pista 3    (Trk=3 diego:4 sonia:6)
+14: juan libera disco
+14: diego obtiene pista 4   (Trk=4 sonia:6)
+15: diego libera disco
+15: sonia obtiene pista 6   (Trk=6 Q=)
+16: sonia libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 5
+1: pedro obtiene pista 5
+2: juan solicita pista 3
+3: ana solicita pista 7
+4: paco solicita pista 1
+5: pedro libera disco
+5: ana obtiene pista 7
+6: maria solicita pista 8
+7: silvia solicita pista 2
+8: ana libera disco
+8: maria obtiene pista 8
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4
+11: sonia solicita pista 6
+12: paco libera disco
+12: silvia obtiene pista 2
+13: silvia libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+14: diego obtiene pista 4
+15: diego libera disco
+15: sonia obtiene pista 6
+16: sonia libera disco
+Aprobado
+
+===============================
+Test de robustez preemptive
+Solo verifica la exclusion mutua
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+100 iteraciones completadas en lector 0 de 100
+Aprobado
+Felicitaciones: paso todos los tests.
+Test con nthreads con spin-locks basados en mutex/condiciones
+El scheduling es non preemtive last come first served
+cd nKernel
+NTHOBJ=nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+gcc -O -c -Wall -Werror -pedantic -std=c18 -Wno-unused-function -Wno-unused-variable -DNTHREADS  nthread.c nutil.c ntime.c pss.c sched-fcfs.c sched-rr.c sched-lcfs1.c sched-pri-1core.c sched-fcfs-1core.c sem.c mutex-cond.c nmsgs.c nStack-amd64.s nsystem.c
+rm -f libnth.a
+ar r libnth.a nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+ranlib libnth.a
+rm nthread.o nutil.o ntime.o pss.o sched-fcfs.o sched-rr.o sched-lcfs1.o sched-pri-1core.o sched-fcfs-1core.o sem.o mutex-cond.o nmsgs.o nStack-amd64.o nsystem.o
+cd ..
+gcc -O -DNTHREADS -Wall -Werror -pedantic -std=c18 -InKernel disk.c test-disk.c priqueue.c spinlocks.c swap.s nKernel/libnth.a -lm -lpthread -lrt -o disk.nbin
+Ejecute con: disk.nbin ... opciones ... (-h para help)
+./disk.nbin -lcfs1
+Info: setting single-core LCFS scheduling
+
+===============================
+Test unitarios
+===============================
+
+--- Primer test: un solo lector de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: pedro libera disco
+--- 2do. test: 2 lectores de disco ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: pedro libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: pedro libera disco
+3: juan obtiene pista 2
+4: juan libera disco
+--- 3er. test: 3 lectores de disco ordenados ---
+Secuencia esperada:
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 1
+1: pedro obtiene pista 1
+2: juan solicita pista 2
+3: diego solicita pista 3
+4: pedro libera disco
+4: juan obtiene pista 2
+5: juan libera disco
+5: diego obtiene pista 3
+6: diego libera disco
+--- 4to. test: 3 lectores de disco desordenados ---
+Secuencia esperada:
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 2
+1: pedro obtiene pista 2
+2: juan solicita pista 1
+3: diego solicita pista 3
+4: pedro libera disco
+4: diego obtiene pista 3
+5: diego libera disco
+5: juan obtiene pista 1
+6: juan libera disco
+--- 5to. test: test del enunciado ---
+Secuencia esperada:
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 4
+1: pedro obtiene pista 4
+2: juan solicita pista 3
+3: ana solicita pista 6
+4: paco solicita pista 2
+5: maria solicita pista 4
+6: silvia solicita pista 1
+7: diego solicita pista 10
+8: pedro libera disco
+8: maria obtiene pista 4
+9: maria libera disco
+9: ana obtiene pista 6
+10: ana libera disco
+10: diego obtiene pista 10
+11: diego libera disco
+11: silvia obtiene pista 1
+12: silvia libera disco
+12: paco obtiene pista 2
+13: paco libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+--- 6to. test: 8 lectores  ---
+Secuencia esperada:
+1: pedro solicita pista 5
+1: pedro obtiene pista 5    (Trk=4)
+2: juan solicita pista 3    (Trk=4 Q=juan:3)
+3: ana solicita pista 7     (Trk=4 Q=ana:7 juan:3)
+4: paco solicita pista 1    (Trk=4 Q=ana:7 paco:1 juan:3)
+5: pedro libera disco
+5: ana obtiene pista 7      (Trk=7 Q=paco:1 juan:3)
+6: maria solicita pista 8   (Trk=7 Q=maria:8 paco:1 juan:3)
+7: silvia solicita pista 2  (Trk=7 Q=maria:8 paco:1 silvia:2 juan:3)
+8: ana libera disco
+8: maria obtiene pista 8    (Trk=8 Q=paco:1 silvia:2 j:3)
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4  (Trk=1 Q=silvia:2 juan:3 diego:4)
+11: sonia solicita pista 6  (Trk=1 Q=silvia:2 juan:3 diego:4 sonia:6)
+12: paco libera disco
+12: silvia obtiene pista 2  (Trk=2 Q=juan:3 diego:4 sonia:6)
+13: silvia libera disco
+13: juan obtiene pista 3    (Trk=3 diego:4 sonia:6)
+14: juan libera disco
+14: diego obtiene pista 4   (Trk=4 sonia:6)
+15: diego libera disco
+15: sonia obtiene pista 6   (Trk=6 Q=)
+16: sonia libera disco
+Secuencia obtenida =========>
+1: pedro solicita pista 5
+1: pedro obtiene pista 5
+2: juan solicita pista 3
+3: ana solicita pista 7
+4: paco solicita pista 1
+5: pedro libera disco
+5: ana obtiene pista 7
+6: maria solicita pista 8
+7: silvia solicita pista 2
+8: ana libera disco
+8: maria obtiene pista 8
+9: maria libera disco
+9: paco obtiene pista 1
+10: diego solicita pista 4
+11: sonia solicita pista 6
+12: paco libera disco
+12: silvia obtiene pista 2
+13: silvia libera disco
+13: juan obtiene pista 3
+14: juan libera disco
+14: diego obtiene pista 4
+15: diego libera disco
+15: sonia obtiene pista 6
+16: sonia libera disco
+Aprobado
+
+===============================
+Test de robustez preemptive
+Solo verifica la exclusion mutua
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+100 iteraciones completadas en lector 0 de 100
+Aprobado
+
+===============================
+Test de robustez non preemptive
+Verifica exclusion mutua y orden
+20 lectores de disco
+===============================
+
+10 iteraciones completadas en lector 0 de 100
+20 iteraciones completadas en lector 0 de 100
+30 iteraciones completadas en lector 0 de 100
+40 iteraciones completadas en lector 0 de 100
+50 iteraciones completadas en lector 0 de 100
+60 iteraciones completadas en lector 0 de 100
+70 iteraciones completadas en lector 0 de 100
+80 iteraciones completadas en lector 0 de 100
+90 iteraciones completadas en lector 0 de 100
+Nro. de threads: 20
+Total solicitudes: 2000
+Largo promedio de la cola del disco: 3.536425
+Aprobado
+Felicitaciones: paso todos los tests.
+Info: Number of cores = 1
+Info: total context changes = 31127
+Info: Implicit context changes = 0
