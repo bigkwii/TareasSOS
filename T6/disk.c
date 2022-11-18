@@ -77,8 +77,11 @@ void releaseDisk() {
       int w_track = priBest(qDown); // track of the node
       int *w_ = priGet(qDown); // wait spinlock of the node
       priPut(qUp, w_, w_track);
+
     }
     spinUnlock(w);
+    spinUnlock(&mutex);
+    return;
   } else {
     state = IDLE;
     currentT = 0;
